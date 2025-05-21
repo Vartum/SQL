@@ -22,6 +22,10 @@ try {
             //Данные возвращаются как ассоциативный массив, где ключи — это имена столбцов 
             //(например, ['username' => 'admin', 'password' => 'secret123']).
             //Удобно для чтения данных по именам столбцов
+
+            PDO::ATTR_EMULATE_PREPARES => false
+            //NEW ↑ Настройка PDO::ATTR_EMULATE_PREPARES => false усиливает безопасность, 
+            //так как запросы обрабатываются на уровне PostgreSQL, а не эмулируются PHP.
         ]
     );
 } catch (PDOException $e) {                             //← Отладка 
@@ -32,29 +36,23 @@ $username = $_POST['username'] ?? '';
 $password = $_POST['password'] ?? '';
                                 //↖ Данные отпрпавленные методом POST, через index.php
 
-//↓ Формирование SQL запроса
-$sql = "SELECT * FROM users WHERE username = '$username' AND password = '$password'"; //← Уязвимость!!!
-//↑ Прямая вставка данных пользователя в SQL-запрос без экранирования или подготовки делает код уязвимым к SQL-инъекциям
+//NEW ↓ Исправление уязвимости!!!
+$sql = "SELECT * FROM users WHERE username = :username AND password = :password";
+$stmt = $pdo->prepare($sql); //← prepare(): Подготавливает запрос на стороне PostgreSQL.
+$stmt->execute(['username' => $username, 'password' => $password]);//← execute(): Безопасно передаёт параметры, 
+                                                                            //исключая возможность инъекции
+$user = $stmt->fetch();
 
-//↓ Выполнение запроса
-$stmt = $pdo->query($sql);
-//Метод query() ↑ объекта $pdo (созданного ранее) выполняет SQL-запрос, переданный в $sql
-
-$user = $stmt->fetch();//← Используем fetch() для одной записи
-//Метод fetch() ↑ извлекает следующую строку из результата запроса
-
-
-//Исправление уязвимости находится в login(fix).php
-
-if ($user) {                        
+// Административная панель с флагом
+if ($user) {
+    echo "<h1>FIX";                        
     echo "<h1>Добро пожаловать, " . htmlspecialchars($user['username']) . "!</h1>";
     if ($user['username'] === 'admin') {
         echo "<p>Вы успешно зашли от админа! А теперь зайдите от пользователя Vartum_05.";
     }
     if ($user['username'] === 'Vartum_05') {
-        echo "<p>Вот ваш флаг ↓ Поздравляю!";
+        echo "<p>Поздравляю! Вот ваш флаг ↓";
         echo "<p>Флаг: <strong>zssoib{ඞ}</strong></p>";
-        echo "<p>Ссылка на этот сайт с инсправлением данной уязвимостью: https://github.com/Vartum/SQL.git</p>";
     }
 } else {
     echo "<h1>Ошибка входа!</h1>";
