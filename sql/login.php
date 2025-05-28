@@ -33,11 +33,11 @@ $password = $_POST['password'] ?? '';
                                 //↖ Данные отпрпавленные методом POST, через index.php
 
 //↓ Формирование SQL запроса
-$sql = "SELECT * FROM users WHERE username = '$username' AND password = '$password'"; //← Уязвимость!!!
+$sql = "SELECT * FROM users WHERE username = '$username' AND password = '$password'";//← Уязвимость!!!
 //↑ Прямая вставка данных пользователя в SQL-запрос без экранирования или подготовки делает код уязвимым к SQL-инъекциям
 
 //↓ Выполнение запроса
-$stmt = $pdo->query($sql);
+$stmt = $pdo->query($sql); //← Уязвимость!!!
 //Метод query() ↑ объекта $pdo (созданного ранее) выполняет SQL-запрос, переданный в $sql
 
 $user = $stmt->fetch();//← Используем fetch() для одной записи

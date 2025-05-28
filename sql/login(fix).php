@@ -45,7 +45,7 @@ $user = $stmt->fetch();
 
 // Административная панель с флагом
 if ($user) {
-    echo "<h1>FIX";                        
+    echo "<h1>FIX";
     echo "<h1>Добро пожаловать, " . htmlspecialchars($user['username']) . "!</h1>";
     if ($user['username'] === 'admin') {
         echo "<p>Вы успешно зашли от админа! А теперь зайдите от пользователя Vartum_05.";

@@ -7,6 +7,5 @@ CREATE TABLE IF NOT EXISTS users (
 -- Тестовые пользователи
 INSERT INTO users (username, password) VALUES 
 ('admin', 'secret123'),
-('goida', 'ZOVZOVZOV'),
 ('monkey2004', 'likebanana'),
 ('Vartum_05', 'V_%');
